@@ -11,22 +11,12 @@ public class MapManager : MonoBehaviour
     public Sprite outsideCorner;
     public Sprite tJunc;
     public Sprite food;
-    public Sprite powerFood;
-    public GameObject piece;
+    public Transform prefab;
     public int[,] levelMap;
-    private int verticalSize;
-    private int horizontalSize;
-    private int rows;
-    private int columns;
-    public int[] wallNums; 
-
+    public int[] wallNums;
     // Start is called before the first frame update
     void Start()
     {
-        verticalSize = (int)Camera.main.orthographicSize;
-        horizontalSize = verticalSize * (Screen.width / Screen.height);
-        columns = 2 * horizontalSize;
-        rows = 2 * verticalSize;
         levelMap = new int[,] {
                         {1,2,2,2,2,2,2,2,2,2,2,2,2,7}, 
                         {2,5,5,5,5,5,5,5,5,5,5,5,5,4}, 
@@ -46,7 +36,6 @@ public class MapManager : MonoBehaviour
                     };
         wallNums = new int[] {1, 2, 3, 4, 7};
         InitiateMap();
-        //Debug.Log(levelMap);
     }
 
     // Update is called once per frame
@@ -55,102 +44,82 @@ public class MapManager : MonoBehaviour
         
     }
 
-    void InitiateMap() //Call ArrayToMap(), RotateMap(), and MirrorMap to build the map
+    void InitiateMap()
     {
-        CreateMap();
-        RotateMap();
-        //MirrorMap();
+        ReadArray();
     }
 
-    void CreateMap() //Find corresponding sprite for each position on the map by the array
+    void ReadArray()
     {
         for (int i = 0; i < levelMap.GetLength(0); i++)
         {
             for (int j = 0; j < levelMap.GetLength(1); j++)
             {
-                Debug.Log(levelMap[i,j]);
-                PlaceSprite(i, j, levelMap[i,j]);
+                int ii = j - levelMap.GetLength(0);
+                int jj = -i + levelMap.GetLength(1);
+                //PlaceSprite(jj, ii, levelMap[i,j]);
+                //PlaceSprite(-jj, ii, levelMap[i,j]);
+                //PlaceSprite(-jj, -ii, levelMap[i,j]);
+                //PlaceSprite(jj, -ii, levelMap[i,j]);
+                PlaceSprite(ii+2, jj, levelMap[i,j], i, j);
+                PlaceSprite(ii+2, -jj, levelMap[i,j], i, j);
+                PlaceSprite(-ii-1, -jj, levelMap[i,j], i, j);
+                PlaceSprite(-ii-1, jj, levelMap[i,j], i, j);
             }
         }
     }
 
-    private void PlaceSprite(int aa, int bb, int position) //Place sprite depending on array index and array value
-    {   
-        int mapX = bb - levelMap.GetLength(0);
-        int mapY = -aa + levelMap.GetLength(1);
-        GameObject mp = new GameObject("mp" + "/" + aa + "/" + bb);
-        GameObject mp1 = new GameObject("mp1" + "/" + aa + "/" + bb);
-        GameObject mp2 = new GameObject("mp2" + "/" + aa + "/" + bb);
-        GameObject mp3 = new GameObject("mp3" + "/" + aa + "/" + bb);
-        //mp.transform.position = new Vector3(bb - levelMap.GetLength(0), -aa + levelMap.GetLength(1) , 0f);
-        mp.transform.position = new Vector3(mapX, mapY, 0f);
-        mp1.transform.position = new Vector3(-mapX, mapY, 0f);
-        mp2.transform.position = new Vector3(-mapX, -mapY, 0f);
-        mp3.transform.position = new Vector3(mapX, -mapY, 0f);
+    private void PlaceSprite(int a, int b, int position, int f, int g)
+    {
+        GameObject mp = new GameObject("mp" + "/" + a + "/" + b);
+        mp.transform.position = new Vector3(a, b, 0f);
         var s = mp.AddComponent<SpriteRenderer>();
-        var s1 = mp1.AddComponent<SpriteRenderer>();
-        var s2 = mp2.AddComponent<SpriteRenderer>();
-        var s3 = mp3.AddComponent<SpriteRenderer>();
+        var ccc = RotateCheck(f,g);
+        if (ccc)
+        {
+            mp.transform.Rotate(0.0f, 0.0f, 90.0f, Space.Self);
+        }
         if (position == 0)
         {
-            Debug.Log("Empty");
+            //Debug.Log("Empty");
         }
         else if (position == 1)
         {
-            Debug.Log("OutCorner");
+            //Debug.Log("OutCorner");
             //var s = mp.AddComponent<SpriteRenderer>();
             s.sprite = outsideCorner;
-            s1.sprite = outsideCorner;
-            s2.sprite = outsideCorner;
-            s3.sprite = outsideCorner;
         }
         else if (position == 2)
         {
-            Debug.Log("OutWall");
+            //Debug.Log("OutWall");
             s.sprite = outsideWall;
-            s1.sprite = outsideWall;
-            s2.sprite = outsideWall;
-            s3.sprite = outsideWall;
         }
         else if (position == 3)
         {
-            Debug.Log("InCorner");
+            //Debug.Log("InCorner");
             s.sprite = insideCorner;
-            s1.sprite = insideCorner;
-            s2.sprite = insideCorner;
-            s3.sprite = insideCorner;
         }
         else if (position == 4)
         {
-            Debug.Log("InWall");
+            //Debug.Log("InWall");
             s.sprite = insideWall;
-            s1.sprite = insideWall;
-            s2.sprite = insideWall;
-            s3.sprite = insideWall;
         }
         else if (position == 5)
         {
-            Debug.Log("pellet");
+            //Debug.Log("pellet");
             s.sprite = food;
-            s1.sprite = food;
-            s2.sprite = food;
-            s3.sprite = food;
         }
         else if (position == 6)
-        {
-            Debug.Log("Big pellet");
-            s.sprite = powerFood;
-            s1.sprite = powerFood;
-            s2.sprite = powerFood;
-            s3.sprite = powerFood;
+        {   
+            //GameObject ps = GameObject.Find("PowerSweet");
+            //mp = GameObject.Find("PowerSweet");
+            //mp.transform.position = new Vector3(a, b, 0f);
+            Instantiate(prefab, new Vector3(a, b, 0f), Quaternion.identity);
         }
         else if (position == 7)
         {
-            Debug.Log("Tjunction");
+            //Debug.Log("Tjunction");
             s.sprite = tJunc;
-            s1.sprite = tJunc;
-            s2.sprite = tJunc;
-            s3.sprite = tJunc;
         }
         else
         {
@@ -158,231 +127,59 @@ public class MapManager : MonoBehaviour
         }
     }
 
-    private void RotateMap() //Rotate the sprite depending on its neighbours
+    private bool RotateCheck(int m, int n)
     {
-        InsideRotate();
-        EdgeRotate();
-        CornerRotate();
-    }
-
-    private void InsideRotate()
-    {
-        for (int a = 1; a < (levelMap.GetLength(0) - 1); a++)
+        if (m >= 1 && m < (levelMap.GetLength(0) - 1) && n >= 1 && n < (levelMap.GetLength(1) - 1))
         {
-            for (int b = 1; (b < levelMap.GetLength(1) - 1); b++)
+            if (Array.Exists(wallNums, element => element == levelMap[m,n]) == true
+            && Array.Exists(wallNums, element => element == levelMap[m+1,n]) == true
+            && Array.Exists(wallNums, element => element == levelMap[m-1,n]) == true)
+            //&& Array.Exists(wallNums, element => element == levelMap[m,n+1]) == false
+            //&& Array.Exists(wallNums, element => element == levelMap[m,n-1]) == false)
             {
-                //Debug.Log("Inside" + levelMap[a,b]);
-                RotateIn(a, b);
+                return (true);
+            }
+            else
+            {
+                return (false);
             }
         }
-    }
-
-    private void EdgeRotate()
-    {
-        for (int e = 0; e < levelMap.GetLength(0); e++)
+        else if ((n == 0 || n == (levelMap.GetLength(1) - 1)) && m != 0 && m != (levelMap.GetLength(0) - 1))
         {   
-            if (e == 0 || e == levelMap.GetLength(0) -1)
+            if (Array.Exists(wallNums, element => element == levelMap[m,n]) == true
+            && Array.Exists(wallNums, element => element == levelMap[m+1,n]) == true
+            && Array.Exists(wallNums, element => element == levelMap[m-1,n]) == true)
             {
-                for (int f = 1; (f < levelMap.GetLength(1) - 1); f++)
-                {
-                    //Debug.Log("--Edge" + levelMap[e,f]);
-                    ///Debug.Log("--Edge" + e + " / " + f);
-                    piece = GameObject.Find("mp" + e + "/" + f);
-                    if (e == 0 && Array.Exists(wallNums, element => element == levelMap[e,f]) == true)
-                    {
-                        if (Array.Exists(wallNums, element => element == levelMap[e,f-1]) == false && Array.Exists(wallNums, element => element == levelMap[e+1,f]) == true && Array.Exists(wallNums, element => element == levelMap[e,f+1]) == false)
-                        {
-                            //Debug.Log("Rotate 90 here---------");
-                            piece.transform.Rotate(0.0f, 0.0f, 90.0f, Space.Self);
-                        }
-                        else if (Array.Exists(wallNums, element => element == levelMap[e,f-1]) == false && Array.Exists(wallNums, element => element == levelMap[e+1,f]) == true && Array.Exists(wallNums, element => element == levelMap[e,f+1]) == true)
-                        {
-                            //Debug.Log("Rotate 180 here---------");
-                            piece.transform.Rotate(0.0f, 0.0f, 180.0f, Space.Self);
-                        }
-                        else if (Array.Exists(wallNums, element => element == levelMap[e,f-1]) == true && Array.Exists(wallNums, element => element == levelMap[e+1,f]) == true && Array.Exists(wallNums, element => element == levelMap[e,f+1]) == false)
-                        {
-                            //Debug.Log("Rotate 270 here---------");
-                            piece.transform.Rotate(0.0f, 0.0f, 270.0f, Space.Self);
-                        }
-                    }
-                    else if (e == levelMap.GetLength(0) -1 && Array.Exists(wallNums, element => element == levelMap[e,f]) == true)
-                    {
-                        if (Array.Exists(wallNums, element => element == levelMap[e,f-1]) == false && Array.Exists(wallNums, element => element == levelMap[e-1,f]) == true && Array.Exists(wallNums, element => element == levelMap[e,f+1]) == true)
-                        {
-                            //Debug.Log("Rotate 90 here---------");
-                            piece.transform.Rotate(0.0f, 0.0f, 90.0f, Space.Self);
-                        }
-                        else if (Array.Exists(wallNums, element => element == levelMap[e,f-1]) == true && Array.Exists(wallNums, element => element == levelMap[e-1,f]) == false && Array.Exists(wallNums, element => element == levelMap[e,f+1]) == false)
-                        {
-                            //Debug.Log("Rotate 270 here---------");
-                            piece.transform.Rotate(0.0f, 0.0f, 270.0f, Space.Self);
-                        }
-                        else if (Array.Exists(wallNums, element => element == levelMap[e,f-1]) == false && Array.Exists(wallNums, element => element == levelMap[e-1,f]) == true && Array.Exists(wallNums, element => element == levelMap[e,f+1]) == false)
-                        {
-                            //Debug.Log("Rotate 90 here---------");
-                            piece.transform.Rotate(0.0f, 0.0f, 90.0f, Space.Self);
-                        }
-                    }
-                }
+                return (true);
+            }
+            else
+            {
+                return (false);
             }
         }
-
-        for (int g = 0; g < levelMap.GetLength(1); g++)
+        else if ( n != 0 && n != (levelMap.GetLength(1) - 1))
         {   
-            if (g == 0 || g == levelMap.GetLength(1) -1)
+            if (m == 0 
+            && Array.Exists(wallNums, element => element == levelMap[m,n]) == true
+            && Array.Exists(wallNums, element => element == levelMap[m+1,n]) == true)
             {
-                for (int h = 1; (h < levelMap.GetLength(0) - 1); h++)
-                {
-                    //Debug.Log("Edge" + levelMap[h,g]);
-                    //Debug.Log("--Edge" + h + " / " + g);
-                    piece = GameObject.Find("mp" + h + "/" + g);
-                    if(g == 0 && Array.Exists(wallNums, element => element == levelMap[h,g]) == true)
-                    {
-                        if (Array.Exists(wallNums, element => element == levelMap[h-1,g]) == true && Array.Exists(wallNums, element => element == levelMap[h,g+1]) == false && Array.Exists(wallNums, element => element == levelMap[h+1,g]) == true)
-                        {
-                            //Debug.Log("Rotate 90 here---------");
-                            piece.transform.Rotate(0.0f, 0.0f, 90.0f, Space.Self);
-                        }
-                        else if (Array.Exists(wallNums, element => element == levelMap[h-1,g]) == false && Array.Exists(wallNums, element => element == levelMap[h,g+1]) == true && Array.Exists(wallNums, element => element == levelMap[h+1,g]) == true)
-                        {
-                            //Debug.Log("Rotate 180 here---------");
-                            piece.transform.Rotate(0.0f, 0.0f, 180.0f, Space.Self);
-                        }
-                        else if (Array.Exists(wallNums, element => element == levelMap[h-1,g]) == true && Array.Exists(wallNums, element => element == levelMap[h,g+1]) == false && Array.Exists(wallNums, element => element == levelMap[h+1,g]) == false)
-                        {
-                            //Debug.Log("Rotate 90 here---------");
-                            piece.transform.Rotate(0.0f, 0.0f, 270.0f, Space.Self);
-                        }
-                        else if (Array.Exists(wallNums, element => element == levelMap[h-1,g]) == false && Array.Exists(wallNums, element => element == levelMap[h,g+1]) == false && Array.Exists(wallNums, element => element == levelMap[h+1,g]) == true)
-                        {
-                            //Debug.Log("Rotate 90 here---------");
-                            piece.transform.Rotate(0.0f, 0.0f, 270.0f, Space.Self);
-                        }
-                    }
-                    else if(g == levelMap.GetLength(1) -1 && Array.Exists(wallNums, element => element == levelMap[h,g]) == true)
-                    {
-                        if (Array.Exists(wallNums, element => element == levelMap[h-1,g]) == true && Array.Exists(wallNums, element => element == levelMap[h,g-1]) == false && Array.Exists(wallNums, element => element == levelMap[h+1,g]) == true)
-                        {
-                            Debug.Log("Rotate 90 here---------");
-                            piece.transform.Rotate(0.0f, 0.0f, 270.0f, Space.Self);
-                        }
-                        else if (Array.Exists(wallNums, element => element == levelMap[h-1,g]) == false && Array.Exists(wallNums, element => element == levelMap[h,g-1]) == true && Array.Exists(wallNums, element => element == levelMap[h+1,g]) == true)
-                        {
-                            Debug.Log("Rotate 270 here---------");
-                            piece.transform.Rotate(0.0f, 0.0f, 90.0f, Space.Self);
-                        }
-                        else if (Array.Exists(wallNums, element => element == levelMap[h-1,g]) == true && Array.Exists(wallNums, element => element == levelMap[h,g-1]) == false && Array.Exists(wallNums, element => element == levelMap[h+1,g]) == false)
-                        {
-                            Debug.Log("Rotate 90 here---------");
-                            piece.transform.Rotate(0.0f, 0.0f, 270.0f, Space.Self);
-                        }
-                        else if (Array.Exists(wallNums, element => element == levelMap[h-1,g]) == false && Array.Exists(wallNums, element => element == levelMap[h,g-1]) == false && Array.Exists(wallNums, element => element == levelMap[h+1,g]) == true)
-                        {
-                            Debug.Log("Rotate 90 here---------");
-                            piece.transform.Rotate(0.0f, 0.0f, 270.0f, Space.Self);
-                        }
-                    }
-                    
-                }
+                return (true);
+            }
+            if (m == (levelMap.GetLength(0) - 1)
+            && Array.Exists(wallNums, element => element == levelMap[m,n]) == true
+            && Array.Exists(wallNums, element => element == levelMap[m-1,n]) == true)
+            {
+                return (true);
+            }
+            else
+            {
+                return (false);
             }
         }
+        else
+            {
+                return (false);
+            }
     }
 
-    private void CornerRotate()
-    {
-        for (int c = 0; c < levelMap.GetLength(0); c++)
-        {   
-            if (c == 0 || c == levelMap.GetLength(0) -1)
-            {
-                for (int d = 0; d < levelMap.GetLength(1); d++)
-                {   
-                    if (d == 0 || d == levelMap.GetLength(1) -1)
-                    Debug.Log("Inside" + c + "/" + d);
-                    RotateOut(c,d);
-                }
-            }
-        }
-    }
-
-    private void RotateIn(int x1, int y1)
-    {
-        //Debug.Log(x1+","+y1+" ready to rotate");
-        //Debug.Log(levelMap[x1,y1]);
-        //Debug.Log(Array.Exists(wallNums, element => element == levelMap[x1,y1]));
-        piece = GameObject.Find("mp" + x1 + "/" + y1);
-        if (Array.Exists(wallNums, element => element == levelMap[x1,y1]) == true)
-        {
-            if ( (Array.Exists(wallNums, element => element == levelMap[x1+1,y1]) == true) && (Array.Exists(wallNums, element => element == levelMap[x1-1,y1]) == true) )
-            {
-                //Debug.Log("Rotate 90 here---------");
-                piece.transform.Rotate(0.0f, 0.0f, 90.0f, Space.Self);
-            }
-            else if ( (Array.Exists(wallNums, element => element == levelMap[x1-1,y1]) == true) && (Array.Exists(wallNums, element => element == levelMap[x1,y1+1]) == true) )
-            {
-                //Debug.Log("Rotate 270 here---------");
-                piece.transform.Rotate(0.0f, 0.0f, 270.0f, Space.Self);
-            }
-            else if ( (Array.Exists(wallNums, element => element == levelMap[x1+1,y1]) == true) && (Array.Exists(wallNums, element => element == levelMap[x1,y1+1]) == true) )
-            {
-                //Debug.Log("Rotate 180 here---------");
-                piece.transform.Rotate(0.0f, 0.0f, 180.0f, Space.Self);
-            }
-            else if ( (Array.Exists(wallNums, element => element == levelMap[x1+1,y1]) == true) && (Array.Exists(wallNums, element => element == levelMap[x1,y1-1]) == true) )
-            {
-                //Debug.Log("Rotate 90 here---------");
-                piece.transform.Rotate(0.0f, 0.0f, 90.0f, Space.Self);
-            }
-        }
-    }
-
-    private void RotateOut(int x2, int y2)
-    {
-        //Debug.Log(x2+","+y2+" ready to rotate");
-        //Debug.Log(levelMap[x2,y2]);
-        //Debug.Log(Array.Exists(wallNums, element => element == levelMap[x2,y2]));
-        piece = GameObject.Find("mp" + x2 + "/" + y2);
-        if (Array.Exists(wallNums, element => element == levelMap[x2,y2]) == true)
-        {
-            if ( x2 == 0 && y2 == 0 && (Array.Exists(wallNums, element => element == levelMap[x2+1,y2]) == true) && (Array.Exists(wallNums, element => element == levelMap[x2,y2+1]) == true) )
-            {
-                //Debug.Log("Rotate 180 here---------");
-                piece.transform.Rotate(0.0f, 0.0f, 180.0f, Space.Self);
-            }
-            else if ( x2 == levelMap.GetLength(0) -1 && y2 == 0 && (Array.Exists(wallNums, element => element == levelMap[x2-1,y2]) == true) && (Array.Exists(wallNums, element => element == levelMap[x2,y2+1]) == true) )
-            {
-                //Debug.Log("Rotate 90 here---------");
-                piece.transform.Rotate(0.0f, 0.0f, 90.0f, Space.Self);
-            }
-            else if ( x2 == 0 && y2 == levelMap.GetLength(1) -1 && (Array.Exists(wallNums, element => element == levelMap[x2,y2-1]) == true) && (Array.Exists(wallNums, element => element == levelMap[x2+1,y2]) == true) )
-            {
-                //Debug.Log("Rotate 270 here---------");
-                piece.transform.Rotate(0.0f, 0.0f, 270.0f, Space.Self);
-            }
-            
-            else if ( x2 == 0 && y2 == 0 && (Array.Exists(wallNums, element => element == levelMap[x2+1,y2]) == true) && (Array.Exists(wallNums, element => element == levelMap[x2,y2+1]) == false) )
-            {
-                //Debug.Log("Rotate 90 here---------");
-                piece.transform.Rotate(0.0f, 0.0f, 90.0f, Space.Self);
-            }
-            else if ( x2 == 0 && y2 == levelMap.GetLength(1) -1 && (Array.Exists(wallNums, element => element == levelMap[x2+1,y2]) == true) && (Array.Exists(wallNums, element => element == levelMap[x2,y2-1]) == false) )
-            {
-                //Debug.Log("Rotate 90 here---------");
-                piece.transform.Rotate(0.0f, 0.0f, 90.0f, Space.Self);
-            }
-            else if ( x2 == levelMap.GetLength(0) -1 && y2 == 0 && (Array.Exists(wallNums, element => element == levelMap[x2-1,y2]) == true) && (Array.Exists(wallNums, element => element == levelMap[x2,y2+1]) == false) )
-            {
-                //Debug.Log("Rotate 90 here---------");
-                piece.transform.Rotate(0.0f, 0.0f, 90.0f, Space.Self);
-            }
-            else if ( x2 == levelMap.GetLength(0) -1 && y2 == levelMap.GetLength(1) && (Array.Exists(wallNums, element => element == levelMap[x2-1,y2]) == true) && (Array.Exists(wallNums, element => element == levelMap[x2,y2-1]) == false) )
-            {
-                //Debug.Log("Rotate 90 here---------");
-                piece.transform.Rotate(0.0f, 0.0f, 90.0f, Space.Self);
-            }
-
-        }
-    }
-
-    
 }
