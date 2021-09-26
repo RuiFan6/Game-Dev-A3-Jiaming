@@ -76,9 +76,21 @@ public class MapManager : MonoBehaviour
 
     private void PlaceSprite(int aa, int bb, int position) //Place sprite depending on array index and array value
     {   
-        GameObject mp = new GameObject("mp" + aa + "/" + bb);
-        mp.transform.position = new Vector3(bb , 0-aa , 0f);
+        int mapX = bb - levelMap.GetLength(0);
+        int mapY = -aa + levelMap.GetLength(1);
+        GameObject mp = new GameObject("mp" + "/" + aa + "/" + bb);
+        GameObject mp1 = new GameObject("mp1" + "/" + aa + "/" + bb);
+        GameObject mp2 = new GameObject("mp2" + "/" + aa + "/" + bb);
+        GameObject mp3 = new GameObject("mp3" + "/" + aa + "/" + bb);
+        //mp.transform.position = new Vector3(bb - levelMap.GetLength(0), -aa + levelMap.GetLength(1) , 0f);
+        mp.transform.position = new Vector3(mapX, mapY, 0f);
+        mp1.transform.position = new Vector3(-mapX, mapY, 0f);
+        mp2.transform.position = new Vector3(-mapX, -mapY, 0f);
+        mp3.transform.position = new Vector3(mapX, -mapY, 0f);
         var s = mp.AddComponent<SpriteRenderer>();
+        var s1 = mp1.AddComponent<SpriteRenderer>();
+        var s2 = mp2.AddComponent<SpriteRenderer>();
+        var s3 = mp3.AddComponent<SpriteRenderer>();
         if (position == 0)
         {
             Debug.Log("Empty");
@@ -88,36 +100,57 @@ public class MapManager : MonoBehaviour
             Debug.Log("OutCorner");
             //var s = mp.AddComponent<SpriteRenderer>();
             s.sprite = outsideCorner;
+            s1.sprite = outsideCorner;
+            s2.sprite = outsideCorner;
+            s3.sprite = outsideCorner;
         }
         else if (position == 2)
         {
             Debug.Log("OutWall");
             s.sprite = outsideWall;
+            s1.sprite = outsideWall;
+            s2.sprite = outsideWall;
+            s3.sprite = outsideWall;
         }
         else if (position == 3)
         {
             Debug.Log("InCorner");
             s.sprite = insideCorner;
+            s1.sprite = insideCorner;
+            s2.sprite = insideCorner;
+            s3.sprite = insideCorner;
         }
         else if (position == 4)
         {
             Debug.Log("InWall");
             s.sprite = insideWall;
+            s1.sprite = insideWall;
+            s2.sprite = insideWall;
+            s3.sprite = insideWall;
         }
         else if (position == 5)
         {
             Debug.Log("pellet");
             s.sprite = food;
+            s1.sprite = food;
+            s2.sprite = food;
+            s3.sprite = food;
         }
         else if (position == 6)
         {
             Debug.Log("Big pellet");
             s.sprite = powerFood;
+            s1.sprite = powerFood;
+            s2.sprite = powerFood;
+            s3.sprite = powerFood;
         }
         else if (position == 7)
         {
             Debug.Log("Tjunction");
             s.sprite = tJunc;
+            s1.sprite = tJunc;
+            s2.sprite = tJunc;
+            s3.sprite = tJunc;
         }
         else
         {
