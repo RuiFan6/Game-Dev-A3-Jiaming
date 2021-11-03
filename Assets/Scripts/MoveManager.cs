@@ -15,8 +15,9 @@ public class MoveManager : MonoBehaviour
         m1 = GetComponent<AudioSource>();
         tweener = gameObject.GetComponent<Tweener>();
         tweener.AddTween(item.transform, item.transform.position, item.transform.position, 0.0f);
-        StartCoroutine(RunCircle());
+        //StartCoroutine(RunCircle());
         //animator.SetInteger("move", 1);
+        animator.SetInteger("move", 1);
     }
 
     //void Awake()
