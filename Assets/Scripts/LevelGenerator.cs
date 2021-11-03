@@ -57,10 +57,6 @@ public class LevelGenerator : MonoBehaviour
             {
                 int ii = j - levelMap.GetLength(0);
                 int jj = -i + levelMap.GetLength(1);
-                //PlaceSprite(jj, ii, levelMap[i,j]);
-                //PlaceSprite(-jj, ii, levelMap[i,j]);
-                //PlaceSprite(-jj, -ii, levelMap[i,j]);
-                //PlaceSprite(jj, -ii, levelMap[i,j]);
                 PlaceSprite(ii+2, jj, levelMap[i,j], i, j);
                 PlaceSprite(ii+2, -jj, levelMap[i,j], i, j);
                 PlaceSprite(-ii-1, -jj, levelMap[i,j], i, j);
