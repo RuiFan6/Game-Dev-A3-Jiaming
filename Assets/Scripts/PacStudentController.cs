@@ -9,63 +9,58 @@ public class PacStudentController : MonoBehaviour
     public Animator animator;
     public AudioSource m1;
     private Vector3 destination;
-    private Vector3 moveDir;
     private int lastInput;
-    private bool walkable;
+    private int currentInput;
 
     void Start()
     {
         m1 = GetComponent<AudioSource>();
         tweener = gameObject.GetComponent<Tweener>();
-        tweener.AddTween(item.transform, item.transform.position, item.transform.position, 0.0f);
         animator.SetInteger("move", 3);
-        walkable = true;
+        animator.enabled = false;
     }
 
     void Update()
     {
-       GetKeyInput();
-       MoveOperator();
+        GetKeyInput();
+        MoveOperator();
     }
 
     void GetKeyInput()
     {
         if (Input.GetKeyDown(KeyCode.A))
         {   
-            lastInput = 4;
-            moveDir = new Vector3(-1f, 0f, 0f);
-            Moveit();
+            currentInput = 4;
+            MoveOperator();
         }
         if (Input.GetKeyDown(KeyCode.D))
         {   
-            lastInput = 2;
-            moveDir = new Vector3(1f, 0f, 0f);
-            Moveit();
+            currentInput = 2;
+            MoveOperator();
         }
         if (Input.GetKeyDown(KeyCode.W))
         {   
-            lastInput = 1;
-            moveDir = new Vector3(0f, 1f, 0f);
-            Moveit();
+            currentInput = 1;
+            MoveOperator();
         }
         if (Input.GetKeyDown(KeyCode.S))
         {   
-            lastInput = 3;
-            moveDir = new Vector3(0f, -1f, 0f);
-            Moveit();
-        }
-        if (Input.GetKeyDown(KeyCode.Q))
-        {   
-            walkable = false;
+            currentInput = 3;
+            MoveOperator();
         }
     }
     void MoveOperator()
     {
-        if (destination == item.transform.position)
+        if (destination == item.transform.position || animator.enabled == false)
         {
-            if (walkable)
+            if (MoveCheck(currentInput) == true)
             {
-                Moveit();
+                lastInput = currentInput;
+                Moveit(currentInput);
+            }
+            else if (MoveCheck(currentInput) == false && MoveCheck(lastInput) == true)
+            {
+                Moveit(lastInput);
             }
             else
             {
@@ -74,12 +69,11 @@ public class PacStudentController : MonoBehaviour
         }
     }
 
-    void Moveit()
+    void Moveit(int inputToMove)
     {
-        walkable = true;
-        destination = item.transform.position + moveDir;
+        destination = InputToDir(inputToMove);
         animator.enabled = true;
-        animator.SetInteger("move", lastInput);
+        animator.SetInteger("move", inputToMove);
         m1.Play();
         tweener.AddTween(item.transform, item.transform.position, destination, 0.5f);
     }
@@ -87,5 +81,39 @@ public class PacStudentController : MonoBehaviour
     void StopMoving()
     {
         animator.enabled = false;
+    }
+
+    bool MoveCheck(int inputToCheck)
+    {
+        if (LevelGenerator.walkablePos.Contains(InputToDir(inputToCheck)))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    Vector3 InputToDir(int input)
+    {
+        Vector3 dir = new Vector3(0f,0f,0f);
+        if(input == 1)
+        {
+            dir = new Vector3(0f, 1f, 0f);
+        }
+        else if(input == 2)
+        {
+            dir = new Vector3(1f, 0f, 0f);
+        }
+        else if(input == 3)
+        {
+            dir = new Vector3(0f, -1f, 0f);
+        }
+        else if(input == 4)
+        {
+            dir = new Vector3(-1f, 0f, 0f);
+        }
+        dir = dir + item.transform.position;
+        return dir;
     }
 }

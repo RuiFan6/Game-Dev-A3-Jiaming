@@ -14,6 +14,8 @@ public class LevelGenerator : MonoBehaviour
     public Transform prefab;
     public int[,] levelMap;
     public int[] wallNums;
+    public GameObject mp;
+    public static List<Vector3> walkablePos;
     // Start is called before the first frame update
     void Start()
     {
@@ -35,7 +37,12 @@ public class LevelGenerator : MonoBehaviour
                         {0,0,0,0,0,0,5,0,0,0,4,0,0,0}
                     };
         wallNums = new int[] {1, 2, 3, 4, 7};
+        walkablePos = new List<Vector3>();
         InitiateMap();
+        //foreach(Vector3 vvv in walkablePos)
+        //{
+        //    Debug.Log(vvv);
+        //}
     }
 
     // Update is called once per frame
@@ -67,7 +74,7 @@ public class LevelGenerator : MonoBehaviour
 
     private void PlaceSprite(int a, int b, int position, int f, int g)
     {
-        GameObject mp = new GameObject("mp" + "/" + a + "/" + b);
+        mp = new GameObject("mp" + "/" + a + "/" + b);
         mp.transform.position = new Vector3(a, b, 0f);
         var s = mp.AddComponent<SpriteRenderer>();
         var ccc = RotateCheck(f,g);
@@ -77,7 +84,7 @@ public class LevelGenerator : MonoBehaviour
         }
         if (position == 0)
         {
-            //Debug.Log("Empty");
+            walkablePos.Add(new Vector3(a, b, 0f));
         }
         else if (position == 1)
         {
@@ -103,6 +110,7 @@ public class LevelGenerator : MonoBehaviour
         else if (position == 5)
         {
             //Debug.Log("pellet");
+            walkablePos.Add(new Vector3(a, b, 0f));
             s.sprite = food;
         }
         else if (position == 6)
@@ -110,6 +118,7 @@ public class LevelGenerator : MonoBehaviour
             //GameObject ps = GameObject.Find("PowerSweet");
             //mp = GameObject.Find("PowerSweet");
             //mp.transform.position = new Vector3(a, b, 0f);
+            walkablePos.Add(new Vector3(a, b, 0f));
             Instantiate(prefab, new Vector3(a, b, 0f), Quaternion.identity);
         }
         else if (position == 7)
