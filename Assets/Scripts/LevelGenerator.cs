@@ -11,7 +11,7 @@ public class LevelGenerator : MonoBehaviour
     public Sprite outsideCorner;
     public Sprite tJunc;
     public Sprite food;
-    public Transform prefab;
+    public GameObject prefab;
     public int[,] levelMap;
     public int[] wallNums;
     public GameObject mp;
@@ -77,6 +77,11 @@ public class LevelGenerator : MonoBehaviour
         mp = new GameObject("mp" + "/" + a + "/" + b);
         mp.transform.position = new Vector3(a, b, 0f);
         var s = mp.AddComponent<SpriteRenderer>();
+        BoxCollider2D bc = mp.AddComponent<BoxCollider2D>();
+        bc.size=new Vector2(1f, 1f);
+        bc.isTrigger = true;
+        //Rigidbody rb = mp.AddComponent<Rigidbody>();
+        //rb.isKinematic = true;
         var ccc = RotateCheck(f,g);
         if (ccc)
         {
@@ -91,27 +96,32 @@ public class LevelGenerator : MonoBehaviour
             //Debug.Log("OutCorner");
             //var s = mp.AddComponent<SpriteRenderer>();
             s.sprite = outsideCorner;
+            mp.tag = "Walls";
         }
         else if (position == 2)
         {
             //Debug.Log("OutWall");
             s.sprite = outsideWall;
+            mp.tag = "Walls";
         }
         else if (position == 3)
         {
             //Debug.Log("InCorner");
             s.sprite = insideCorner;
+            mp.tag = "Walls";
         }
         else if (position == 4)
         {
             //Debug.Log("InWall");
             s.sprite = insideWall;
+            mp.tag = "Walls";
         }
         else if (position == 5)
         {
             //Debug.Log("pellet");
             walkablePos.Add(new Vector3(a, b, 0f));
             s.sprite = food;
+            mp.tag = "Pellets";
         }
         else if (position == 6)
         {   
@@ -119,12 +129,19 @@ public class LevelGenerator : MonoBehaviour
             //mp = GameObject.Find("PowerSweet");
             //mp.transform.position = new Vector3(a, b, 0f);
             walkablePos.Add(new Vector3(a, b, 0f));
-            Instantiate(prefab, new Vector3(a, b, 0f), Quaternion.identity);
+            GameObject clone1;
+            clone1 = Instantiate(prefab, new Vector3(a, b, 0f), Quaternion.identity);
+            clone1.tag = "PowerPellets";
+            mp.tag = "PowerPellets";
+            BoxCollider2D bc1 = clone1.AddComponent<BoxCollider2D>();
+            bc1.size=new Vector2(1f, 1f);
+            bc1.isTrigger = true;
         }
         else if (position == 7)
         {
             //Debug.Log("Tjunction");
             s.sprite = tJunc;
+            mp.tag = "Walls";
         }
         else
         {

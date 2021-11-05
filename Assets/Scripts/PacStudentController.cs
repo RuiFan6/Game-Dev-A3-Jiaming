@@ -8,46 +8,55 @@ public class PacStudentController : MonoBehaviour
     private Tweener tweener;
     public Animator animator;
     public AudioSource m1;
+    public static bool freeze;
     private Vector3 destination;
     private int lastInput;
     private int currentInput;
 
     void Start()
     {
+        freeze = false;
         m1 = GetComponent<AudioSource>();
         tweener = gameObject.GetComponent<Tweener>();
         animator.SetInteger("move", 3);
         animator.enabled = false;
+        item.transform.position = new Vector3(-12f, 13f, 0);
     }
 
     void Update()
     {
         GetKeyInput();
         MoveOperator();
+        Teleport();
+        //Ohno();
     }
 
     void GetKeyInput()
     {
-        if (Input.GetKeyDown(KeyCode.A))
-        {   
-            currentInput = 4;
-            MoveOperator();
+        if(freeze == false)
+        {
+            if (Input.GetKeyDown(KeyCode.A))
+            {   
+                currentInput = 4;
+                MoveOperator();
+            }
+            if (Input.GetKeyDown(KeyCode.D))
+            {   
+                currentInput = 2;
+                MoveOperator();
+            }
+            if (Input.GetKeyDown(KeyCode.W))
+            {   
+                currentInput = 1;
+                MoveOperator();
+            }
+            if (Input.GetKeyDown(KeyCode.S))
+            {   
+                currentInput = 3;
+                MoveOperator();
+            }
         }
-        if (Input.GetKeyDown(KeyCode.D))
-        {   
-            currentInput = 2;
-            MoveOperator();
-        }
-        if (Input.GetKeyDown(KeyCode.W))
-        {   
-            currentInput = 1;
-            MoveOperator();
-        }
-        if (Input.GetKeyDown(KeyCode.S))
-        {   
-            currentInput = 3;
-            MoveOperator();
-        }
+        
     }
     void MoveOperator()
     {
@@ -116,4 +125,28 @@ public class PacStudentController : MonoBehaviour
         dir = dir + item.transform.position;
         return dir;
     }
+    void Teleport()
+    {
+        if(item.transform.position == new Vector3(-13f, 0f, 0f))
+        {
+            item.transform.position = new Vector3(14f, 0f, 0f);
+        }
+        else if(item.transform.position == new Vector3(14f, 0f, 0f))
+        {
+            item.transform.position = new Vector3(-13f, 0f, 0f);
+        }
+    }
+
+    void Ohno()
+    {
+        if (PlayerCollision.death)
+        {
+            animator.SetInteger("move", 7);
+        }
+        else
+        {
+            
+        }
+    }
+
 }
